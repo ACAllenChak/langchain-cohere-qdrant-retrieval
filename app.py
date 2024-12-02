@@ -40,13 +40,14 @@ def embed_pdf():
 # Retrieve information from a collection
 from langchain.chains.question_answering import load_qa_chain
 from langchain.llms import OpenAI
+
 from qdrant_client import QdrantClient
 
 @app.route('/retrieve', methods=['POST'])
 def retrieve_info():
     collection_name = request.json.get("collection_name")
     query = request.json.get("query")
-
+    llm = OpenAI(model_name="gpt-3.5-turbo-instruct")
     client = QdrantClient(url=qdrant_url, prefer_grpc=True, api_key=qdrant_api_key)
 
     embeddings = CohereEmbeddings(model="multilingual-22-12", cohere_api_key=cohere_api_key)
