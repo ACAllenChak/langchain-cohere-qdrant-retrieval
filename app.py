@@ -47,13 +47,12 @@ from qdrant_client import QdrantClient
 def retrieve_info():
     collection_name = request.json.get("collection_name")
     query = request.json.get("query")
-    llm = OpenAI(model_name="gpt-3.5-turbo-instruct")
     client = QdrantClient(url=qdrant_url, prefer_grpc=True, api_key=qdrant_api_key)
 
     embeddings = CohereEmbeddings(model="multilingual-22-12", cohere_api_key=cohere_api_key)
     qdrant = Qdrant(client=client, collection_name=collection_name, embedding_function=embeddings.embed_query)
     search_results = qdrant.similarity_search(query, k=2)
-    chain = load_qa_chain(OpenAI(openai_api_key=openai_api_key,temperature=0.2), chain_type="stuff")
+    chain = load_qa_chain(OpenAI(model_name="gpt-3.5-turbo-instruct",openai_api_key=openai_api_key,temperature=0.2), chain_type="stuff")
     results = chain({"input_documents": search_results, "question": query}, return_only_outputs=True)
     
     return {"results":results["output_text"]}
